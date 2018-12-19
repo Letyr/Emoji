@@ -1,7 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { EmojiService } from './emoji.service';
-import {Observable} from 'rxjs';
-import Emoji from './emoji';
 
 @Component({
   selector: 'app-root',
@@ -10,24 +7,9 @@ import Emoji from './emoji';
 })
 export class AppComponent implements OnInit {
 
-  emojies: Observable<Array<Emoji>> = null;
-
-  constructor (private emojiService: EmojiService) {
-
-  }
+  constructor() { }
 
   ngOnInit() {
-    this.emojiService.getEmoji().subscribe(
-      data => {
-        console.log('data: ', data);
-      },
-      err => {
-        console.log('error: ', err);
-      },
-      () => {
-        console.log('done');
-      }
-    );
   }
 
 }

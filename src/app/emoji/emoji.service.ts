@@ -8,10 +8,14 @@ import Emoji from './emoji';
 })
 export class EmojiService {
 
+  favorite: Array<string> = [];
+  deleted: Array<string> = [];
+
   constructor(private http: HttpClient) { }
 
-  getAll(): Observable<Array<Emoji>> {
-    return new Observable<Array<Emoji>>();
+  // TODO
+  synchTags () {
+
   }
 
   getEmoji() {
