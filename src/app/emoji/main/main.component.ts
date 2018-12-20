@@ -10,17 +10,47 @@ import {EmojiService} from '../emoji.service';
 })
 export class MainComponent implements OnInit {
 
-  emojies: Emoji[] = null;
+  lists: { tag: string, emojies: Emoji[] }[] = [{
+    tag: 'Все',
+    emojies: []
+  }, {
+    tag: 'Любимые',
+    emojies: []
+  }, {
+    tag: 'Удаленные',
+    emojies: []
+  }];
+
+  currentState = 0;
+
+  loading = false;
+
+  error = false;
 
   constructor (private emojiService: EmojiService) {
 
   }
 
-  updateEmojies () {
-    this.emojiService.getEmoji().subscribe((data: Object) => {
-        if (data) {
-          // this.emojies = Observable.of(Object.keys(data).map(key => new Emoji(key, data[key])));
-          this.emojies = Object.keys(data).map(key => new Emoji(key, data[key]));
+  changeState (state) {
+    this.currentState = state;
+  }
+
+  updateEmojies (jsondata: Object) {
+    const allList = this.lists.find(list => list.tag === 'Все');
+
+    if (allList) {
+      allList.emojies = Object.keys(jsondata).map(key => new Emoji(key, jsondata[key]));
+
+      console.log(allList);
+    }
+  }
+
+  ngOnInit() {
+    this.loading = true;
+    this.emojiService.getEmoji().subscribe((jsondata: Object) => {
+        if (jsondata) {
+          this.updateEmojies(jsondata);
+          this.changeState(0);
         } else {
           // TODO error of received data
         }
@@ -29,17 +59,14 @@ export class MainComponent implements OnInit {
         // TODO something goes wrong
         console.error('Something goes wrong!');
         console.error(err);
+        this.error = true;
       },
       () => {
         console.log('Load emoji data complete!');
-        console.log(this.emojies);
+        this.loading = false;
       }
     );
     // TODO data loading
-  }
-
-  ngOnInit() {
-    this.updateEmojies();
   }
 
 }

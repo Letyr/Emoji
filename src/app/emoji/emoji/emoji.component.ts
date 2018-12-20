@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import Emoji from '../emoji';
+import { Lightbox } from 'ngx-lightbox';
 
 @Component({
   selector: 'app-emoji',
@@ -7,9 +9,19 @@ import { Component, OnInit } from '@angular/core';
 })
 export class EmojiComponent implements OnInit {
 
-  constructor() { }
+  @Input() emoji: Emoji;
+
+  constructor(private _lightbox: Lightbox) { }
 
   ngOnInit() {
+  }
+
+  open () {
+    this._lightbox.open([{
+      src: this.emoji.link,
+      caption: `Emoji ${this.emoji.name}`,
+      thumb: this.emoji.link
+    }], 0);
   }
 
 }

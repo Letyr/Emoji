@@ -8,9 +8,6 @@ import Emoji from './emoji';
 })
 export class EmojiService {
 
-  favorite: Array<string> = [];
-  deleted: Array<string> = [];
-
   constructor(private http: HttpClient) { }
 
   // TODO

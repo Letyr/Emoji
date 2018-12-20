@@ -1,14 +1,41 @@
-<div class="container">
+<div class="container" *ngIf="!loading; else cloak">
   <div class="row">
-    <div class="col-3">
+    <div class="col-2">
+
       <ul class="btn-group-vertical">
-        <li class="btn btn-danger">Все</li>
-        <li class="btn btn-danger">Любимые</li>
-        <li class="btn btn-danger">Удаленные</li>
+        <li class="btn btn-danger" *ngFor="let list of lists; let i = index" (click)="changeState(i)">{{list.tag}}</li>
       </ul>
+
+      <mat-button-toggle-group [vertical]="true">
+        <mat-button-toggle value="Hello">asdasd</mat-button-toggle>
+        <mat-button-toggle value="Again">asdasd</mat-button-toggle>
+        <mat-button-toggle value="Friend">asdasdasd</mat-button-toggle>
+      </mat-button-toggle-group>
+
     </div>
-    <div class="col-9">
+    <div class="container col-10">
+
+      <div class="row">
+        <div class="col-8">
+          {{ lists[currentState].tag }}
+        </div>
+        <div class="col-4">
+          Поиск
+        </div>
+      </div>
+
+      <div class="row" *ngIf="lists[currentState].emojies.length === 0; else notempty">
+        Список пуст
+      </div>
+      <ng-template #notempty>
+        <app-emoji *ngFor="let emoji of lists[currentState].emojies" [emoji]="emoji"></app-emoji>
+      </ng-template>
 
     </div>
   </div>
+
 </div>
+
+<ng-template #cloak>
+  Загрузка...
+</ng-template>
