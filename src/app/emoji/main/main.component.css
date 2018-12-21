@@ -1,0 +1,28 @@
+.nav-menu {
+  width: 100%;
+}
+
+.title {
+  display: block;
+  position: relative;
+  bottom: 0;
+  text-align: center;
+  padding-top: 0.75em;
+  /* TODO FFFUUUUU don't show this to employer */
+}
+
+.search {
+  margin-top: -10px;
+}
+
+.search__field {
+  width: calc(100% - 79px)
+}
+
+.search__button {
+  /* TODO how to change WIDTH WTF!& */
+  width: 30px !important;
+  max-width: 30px !important;
+
+  margin-left: 15px;
+}

@@ -14,9 +14,9 @@
     <img [src]="emoji.link" (click)="open()" alt="Emoji! Everyone love emoji!">
   </div>
   <div class="col-1">
-    <button><i class="fa fa-star"></i></button>
+    <button mat-stroked-button="{color: 'primary'}"><i class="fa fa-star"></i></button>
   </div>
   <div class="col-1">
-    <button><i class="fa fa-trash"></i></button>
+    <button mat-stroked-button="" [color]="'primary'"><i class="fa fa-trash"></i></button>
   </div>
 </div>

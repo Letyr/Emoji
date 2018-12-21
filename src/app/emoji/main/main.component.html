@@ -2,34 +2,42 @@
   <div class="row">
     <div class="col-2">
 
+      <!--
       <ul class="btn-group-vertical">
-        <li class="btn btn-danger" *ngFor="let list of lists; let i = index" (click)="changeState(i)">{{list.tag}}</li>
+        <li class="btn btn-danger" >{{list.tag}}</li>
       </ul>
+      -->
 
-      <mat-button-toggle-group [vertical]="true">
-        <mat-button-toggle value="Hello">asdasd</mat-button-toggle>
-        <mat-button-toggle value="Again">asdasd</mat-button-toggle>
-        <mat-button-toggle value="Friend">asdasdasd</mat-button-toggle>
+      <mat-button-toggle-group class="nav-menu" [vertical]="true">
+        <mat-button-toggle *ngFor="let list of lists; let i = index" (click)="changeState(i)" [checked]="i === currentState">{{list.tag}}</mat-button-toggle>
       </mat-button-toggle-group>
 
     </div>
-    <div class="container col-10">
+    <div class="col-10 container">
 
-      <div class="row">
-        <div class="col-8">
-          {{ lists[currentState].tag }}
-        </div>
-        <div class="col-4">
-          Поиск
-        </div>
-      </div>
+      <mat-card>
+        <div class="row">
 
+          <div class="col-8">
+            <div class="title">{{ lists[currentState].tag }}</div>
+          </div>
+
+          <div class="search col-4">
+            <mat-form-field class="search__field"><input matInput placeholder="Input emoji name"></mat-form-field>
+            <button class="search__button" mat-stroked-button><i class="fa fa-search"></i></button>
+          </div>
+
+        </div>
+      </mat-card>
+
+      <!--
       <div class="row" *ngIf="lists[currentState].emojies.length === 0; else notempty">
         Список пуст
       </div>
       <ng-template #notempty>
         <app-emoji *ngFor="let emoji of lists[currentState].emojies" [emoji]="emoji"></app-emoji>
       </ng-template>
+      -->
 
     </div>
   </div>
