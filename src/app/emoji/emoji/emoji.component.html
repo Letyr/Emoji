@@ -1,22 +1,33 @@
-<div class="row">
-  <div class="col-8">
+<div class="emoji row">
+
+  <div class="col-2">
     {{emoji.name}}
   </div>
-  <div class="col-4">
-    [Превью | действия]
+
+  <div class="col-6">
+      <a [href]="emoji.link">{{emoji.link}}</a>
   </div>
+
+  <div class="col-2 d-flex">
+    <img class="emoji__image" [src]="emoji.link" (click)="open()" alt="Emoji! Everyone love emoji!">
+  </div>
+
+  <div class="col-2 d-flex" [ngSwitch]="emoji.status">
+
+    <ng-container *ngSwitchCase="emojiService.noneStatus">
+      <button mat-icon-button class="emoji__button" (click)="changeEmojiStatus(emojiService.favoriteStatus)"><i class="fa fa-star"></i></button>
+      <button mat-icon-button class="emoji__button" (click)="changeEmojiStatus(emojiService.deletedStatus)"><i class="fa fa-trash"></i></button>
+    </ng-container>
+
+    <ng-container *ngSwitchCase="emojiService.deletedStatus">
+      <button mat-stroked-button class="emoji__button" (click)="changeEmojiStatus(emojiService.noneStatus)">Востановить</button>
+    </ng-container>
+
+    <ng-container *ngSwitchCase="emojiService.favoriteStatus">
+      <button mat-icon-button class="emoji__button emoji__button_red" (click)="changeEmojiStatus(emojiService.noneStatus)"><i class="fa fa-star"></i></button>
+    </ng-container>
+
+  </div>
+
 </div>
-<div class="row">
-  <div class="col-8">
-    {{emoji.link}}
-  </div>
-  <div class="col-2">
-    <img [src]="emoji.link" (click)="open()" alt="Emoji! Everyone love emoji!">
-  </div>
-  <div class="col-1">
-    <button mat-stroked-button="{color: 'primary'}"><i class="fa fa-star"></i></button>
-  </div>
-  <div class="col-1">
-    <button mat-stroked-button="" [color]="'primary'"><i class="fa fa-trash"></i></button>
-  </div>
-</div>
+

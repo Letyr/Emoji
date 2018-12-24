@@ -1,3 +1,27 @@
-.emoji_button {
+button:focus {
+  outline: none;
+  border: 0;
+}
 
+.emoji {
+  border-top: 1px solid rgba(0,0,0,.1);
+}
+
+.emoji > div {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.emoji__button {
+  margin: auto 0;
+}
+
+.emoji__button_red {
+  color: red;
+}
+
+.emoji__image {
+  width: 25px;
+  height: 25px;
+  margin: auto;
 }

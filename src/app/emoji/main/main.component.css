@@ -1,28 +1,39 @@
-.nav-menu {
+.cloak {
+  margin: 50px auto;
+  text-align: center;
+  font-size: 24px;
+  color: red;
+}
+
+.cloak__spiner {
+  margin: auto;
+}
+
+.navmenu {
   width: 100%;
 }
 
-.title {
-  display: block;
-  position: relative;
-  bottom: 0;
-  text-align: center;
-  padding-top: 0.75em;
-  /* TODO FFFUUUUU don't show this to employer */
+.navbar {
+  display: flex;
+  margin-bottom: 15px;
+}
+
+.content {
+  max-height: 400px;
 }
 
 .search {
-  margin-top: -10px;
+
 }
 
 .search__field {
-  width: calc(100% - 79px)
+
 }
 
 .search__button {
-  /* TODO how to change WIDTH WTF!& */
-  width: 30px !important;
-  max-width: 30px !important;
-
   margin-left: 15px;
+}
+
+.search__icon {
+  font-size: 0.75rem;
 }

@@ -1,49 +1,62 @@
 <div class="container" *ngIf="!loading; else cloak">
   <div class="row">
+
     <div class="col-2">
-
-      <!--
-      <ul class="btn-group-vertical">
-        <li class="btn btn-danger" >{{list.tag}}</li>
-      </ul>
-      -->
-
-      <mat-button-toggle-group class="nav-menu" [vertical]="true">
-        <mat-button-toggle *ngFor="let list of lists; let i = index" (click)="changeState(i)" [checked]="i === currentState">{{list.tag}}</mat-button-toggle>
+      <mat-button-toggle-group class="navmenu" [vertical]="true">
+        <mat-button-toggle *ngFor="let list of emojiService.lists | keyvalue: nameOrdering" (click)="changeList(list.key)" [checked]="list.key === currentListIndex">{{list.value.name}}</mat-button-toggle>
       </mat-button-toggle-group>
-
     </div>
+
     <div class="col-10 container">
+      <mat-card class="navbar">
 
-      <mat-card>
-        <div class="row">
+        <mat-card-header>
+          <mat-card-title>
+            {{ emojiService.lists[currentListIndex].name }}
+          </mat-card-title>
+        </mat-card-header>
 
-          <div class="col-8">
-            <div class="title">{{ lists[currentState].tag }}</div>
+        <mat-card-content>
+          <div class="search">
+            <mat-form-field class="search__field">
+              <input type="text" matInput placeholder="Emoji name" [(ngModel)]="seekValue" (input)="seek(seekValue)">
+              <mat-icon matSuffix class="search__icon"><i class="fa fa-search"></i></mat-icon>
+            </mat-form-field>
+            <button class="search__button" mat-stroked-button (click)="seek(seekValue)">Search</button>
           </div>
+        </mat-card-content>
 
-          <div class="search col-4">
-            <mat-form-field class="search__field"><input matInput placeholder="Input emoji name"></mat-form-field>
-            <button class="search__button" mat-stroked-button><i class="fa fa-search"></i></button>
-          </div>
-
-        </div>
       </mat-card>
 
-      <!--
-      <div class="row" *ngIf="lists[currentState].emojies.length === 0; else notempty">
-        Список пуст
-      </div>
-      <ng-template #notempty>
-        <app-emoji *ngFor="let emoji of lists[currentState].emojies" [emoji]="emoji"></app-emoji>
+      <mat-card class="content" [style.overflow]="'auto'" *ngIf="currentList.length > 0; else emptylist">
+
+        <!-- TODO добавить сортировку? -->
+        <div class="container">
+          <div class="row">
+            <div class="col-2">Имя</div>
+            <div class="col-6">Ссылка</div>
+            <div class="text-center col-2">Превью</div>
+            <div class="col-2"></div>
+          </div>
+          <app-emoji *ngFor="let emoji of currentList" [emoji]="emoji" (statusChanged)="changeEmojiStatus(emoji, $event)"></app-emoji>
+        </div>
+
+      </mat-card>
+
+      <ng-template #emptylist>
+        <mat-card>
+           Список пуст
+        </mat-card>
       </ng-template>
-      -->
 
     </div>
-  </div>
 
+  </div>
 </div>
 
 <ng-template #cloak>
-  Загрузка...
+  <div class="cloak">
+    <mat-spinner class="cloak__spiner" [color]="'warn'" [diameter]="'80'"></mat-spinner>
+    ...Loading...
+  </div>
 </ng-template>
