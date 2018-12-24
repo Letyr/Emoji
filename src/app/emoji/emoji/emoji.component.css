@@ -24,4 +24,13 @@ button:focus {
   width: 25px;
   height: 25px;
   margin: auto;
+
+  transition: width, height;
+  transition-duration: 0.15s;
+  transition-timing-function: ease-out;
+}
+
+.emoji__image:hover {
+  width: 40px;
+  height: 40px;
 }

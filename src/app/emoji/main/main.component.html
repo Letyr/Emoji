@@ -4,6 +4,7 @@
     <div class="col-2">
       <mat-button-toggle-group class="navmenu" [vertical]="true">
         <mat-button-toggle *ngFor="let list of emojiService.lists | keyvalue: nameOrdering" (click)="changeList(list.key)" [checked]="list.key === currentListIndex">{{list.value.name}}</mat-button-toggle>
+        <!--<mat-button-toggle *ngFor="let key of pagination()" (click)="changeList(key)" [checked]="key === currentListIndex">{{emojiService.lists[key].name}}</mat-button-toggle>-->
       </mat-button-toggle-group>
     </div>
 
@@ -28,24 +29,35 @@
 
       </mat-card>
 
-      <mat-card class="content" [style.overflow]="'auto'" *ngIf="currentList.length > 0; else emptylist">
+      <mat-card [style.overflow]="'auto'" *ngIf="currentList.length > 0; else emptylist">
 
         <!-- TODO добавить сортировку? -->
         <div class="container">
+
           <div class="row">
             <div class="col-2">Имя</div>
             <div class="col-6">Ссылка</div>
             <div class="text-center col-2">Превью</div>
             <div class="col-2"></div>
           </div>
-          <app-emoji *ngFor="let emoji of currentList" [emoji]="emoji" (statusChanged)="changeEmojiStatus(emoji, $event)"></app-emoji>
+
+          <div class="content">
+            <app-emoji *ngFor="let emoji of pagination()" [emoji]="emoji" (statusChanged)="changeEmojiStatus(emoji, $event)"></app-emoji>
+          </div>
+
         </div>
+
+        <mat-card-footer>
+          <button mat-icon-button (click)="paginationChange(paginationPage - 1)"><i class="fa fa-angle-left"></i></button>
+          {{ paginationPage }}
+          <button mat-icon-button (click)="paginationChange(paginationPage + 1)"><i class="fa fa-angle-right"></i></button>
+        </mat-card-footer>
 
       </mat-card>
 
       <ng-template #emptylist>
         <mat-card>
-           Список пуст
+           {{ seekValue ? 'Эмодзи не найдено' : 'Список пуст'}}
         </mat-card>
       </ng-template>
 

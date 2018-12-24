@@ -24,12 +24,33 @@ export class MainComponent implements OnInit {
   // Флаг ошибки... какой-нибудь
   private error = false;
 
+  private paginationCount = 10;
+
+  private paginationPage = 0;
+
   // emojiService исползуется для манипуляций с данными о эмодзи
   constructor(private route: ActivatedRoute, private emojiService: EmojiService) {
   }
 
   nameOrdering(l1, l2) {
     return l1.value.name > l2.value.name;
+  }
+
+  pagination () {
+    const s = this.paginationPage * this.paginationCount;
+    const e = s + this.paginationCount;
+    const pagination = this.currentList.slice(s, e);
+    if (pagination.length === 0 && this.paginationPage > 0) {
+      this.paginationChange(this.paginationPage - 1);
+      return this.pagination();
+    }
+    return pagination;
+  }
+
+  paginationChange (page) {
+    if (page >= 0 && page * this.paginationCount < this.currentList.length) {
+      this.paginationPage = page;
+    }
   }
 
   // Метод смены списка
@@ -39,10 +60,12 @@ export class MainComponent implements OnInit {
     } else {
       // Попытка доступа к несуществующему списку. Типа обработка ошибок, не знаю зачем добавил
     }
+
+    this.paginationChange(0);
+
     // Сбрасывает текущий currentList для отображения актуального списка
     this.seek(this.seekValue);
   }
-
 
   // Метод смены состояния эмодзи
   changeEmojiStatus(emoji, status) {
@@ -102,11 +125,7 @@ export class MainComponent implements OnInit {
       // Сложно. Лучше уж пока bootstrap в руках, чем MatTables в небе
       // TODO Спросить у куратора про пагинацию. Делать свою с блэкджеком?
 
-      // TODO раскоментировать эту строчку и закоментировать следующую если требуется отобразить весь список
-      // this.currentList = this.lists[this.currentListIndex].emojies;
-
-      // TODO закоментировать эту строчку и раскоментировать предыдущую если требуется отобразить весь список
-      this.currentList = [];
+       this.currentList = this.emojiService.lists[this.currentListIndex].emojies;
     }
     this.sort();
   }

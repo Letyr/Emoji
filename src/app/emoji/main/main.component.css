@@ -19,7 +19,9 @@
 }
 
 .content {
-  max-height: 400px;
+  overflow-y: auto;
+  max-height: 350px;
+  overflow-x: hidden;
 }
 
 .search {
