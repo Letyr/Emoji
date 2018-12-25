@@ -11,24 +11,24 @@ export class EmojiService {
   private storageKey = 'emoji_statuses';
 
   // Статусы эмодзи. Можно было сделать просто числа это производительнее, но так читабельней
-  public deletedStatus = 'deleted';
-  public favoriteStatus = 'favorite';
-  public noneStatus = 'none';
+  public DELETED = 'deleted';
+  public FAVORITE = 'favorite';
+  public NONE = 'none';
 
   // Переменная, содержащая в себе созраненный в хранилище статусы эмодзи. Lazy initialization
   private _statuses = null;
 
   // lists - списки с эмодзи. Каждому списку соответствует свое имя, тэг статуса и массив с моделями, связан со вьюшкой.
     public lists = {
-    [this.noneStatus]: {
+    [this.NONE]: {
       name: 'Все',
       emojies: []
     },
-    [this.favoriteStatus]: {
+    [this.FAVORITE]: {
       name: 'Любимые',
       emojies: []
     },
-    [this.deletedStatus]: {
+    [this.DELETED]: {
       name: 'Удаленные',
       emojies: []
     }
@@ -51,7 +51,7 @@ export class EmojiService {
 
   // Метод добавления статуса в хранилище (или удаления)
   public saveEmojiToStorage (emoji) {
-    if (emoji.status === this.noneStatus) {
+    if (emoji.status === this.NONE) {
       delete this.statuses[emoji.name];
     } else {
       this.statuses[emoji.name] = emoji.status;
@@ -77,7 +77,7 @@ export class EmojiService {
           if (jsondata) {
             const emojies = this.parseJson(jsondata);
 
-            this.lists[this.noneStatus].emojies = emojies;
+            this.lists[this.NONE].emojies = emojies;
 
             console.log('Load emoji data complete!');
 
