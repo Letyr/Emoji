@@ -6,14 +6,14 @@
         <!--<mat-button-toggle
           *ngFor="let list of emojiService.lists | keyvalue: nameOrdering"
           (click)="changeList(list.key)"
-          [checked]="list.key === currentListIndex">{{list.value.name}}
+          [checked]="list.key === currentListTag">{{list.value.name}}
         </mat-button-toggle>-->
         <mat-button-toggle
           *ngFor="let list of emojiService.lists | keyvalue: nameOrdering"
-          [routerLink]="['/emoji', (list.key === 'none' ? '' : list.key)]" [queryParams]="{ search: searchValue }"
-          [checked]="list.key === currentListIndex">{{list.value.name}}
+          [routerLink]="['/emoji', (list.key === 'ALL' ? '' : list.key)]" [queryParams]="{ search: searchValue }"
+          [checked]="list.key === currentListTag">{{list.value.name}}
         </mat-button-toggle>
-        <!--<mat-button-toggle *ngFor="let key of pagination()" (click)="changeList(key)" [checked]="key === currentListIndex">{{emojiService.lists[key].name}}</mat-button-toggle>-->
+        <!--<mat-button-toggle *ngFor="let key of pagination()" (click)="changeList(key)" [checked]="key === currentListTag">{{emojiService.lists[key].name}}</mat-button-toggle>-->
       </mat-button-toggle-group>
     </div>
 
@@ -22,14 +22,14 @@
 
         <mat-card-header>
           <mat-card-title>
-            {{ emojiService.lists[currentListIndex].name }}
+            {{ emojiService.lists[currentListTag].name }}
           </mat-card-title>
         </mat-card-header>
 
         <mat-card-content>
           <div class="search">
             <mat-form-field class="search__field">
-              <input type="text" matInput placeholder="Emoji name" [(ngModel)]="searchValue">
+              <input type="text" matInput placeholder="Emoji name" [(ngModel)]="searchValue" (keydown)="onEnter($event)">
               <mat-icon matSuffix class="search__icon"><i class="fa fa-search"></i></mat-icon>
             </mat-form-field>
             <button class="search__button" mat-stroked-button (click)="setSearchQueryParams()">Search</button>
@@ -51,7 +51,7 @@
           </div>
 
           <div class="content">
-            <app-emoji *ngFor="let emoji of pagination()" [emoji]="emoji" (statusChanged)="changeEmojiStatus(emoji, $event)"></app-emoji>
+            <app-emoji *ngFor="let index of pagination()" [emoji]="emojiService.emojies[index]" (statusChanged)="changeEmojiStatus(index, $event)"></app-emoji>
           </div>
 
         </div>

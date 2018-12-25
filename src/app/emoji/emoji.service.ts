@@ -8,29 +8,33 @@ import { Emoji } from './emoji';
 export class EmojiService {
 
   // Ключ для хранилища. Вынес в переменную для удобства
-  private storageKey = 'emoji_statuses';
-
-  // Статусы эмодзи. Можно было сделать просто числа это производительнее, но так читабельней
-  public DELETED = 'deleted';
-  public FAVORITE = 'favorite';
-  public NONE = 'none';
+  private STORAGEKEY = 'emoji_statuses';
 
   // Переменная, содержащая в себе созраненный в хранилище статусы эмодзи. Lazy initialization
   private _statuses = null;
 
-  // lists - списки с эмодзи. Каждому списку соответствует свое имя, тэг статуса и массив с моделями, связан со вьюшкой.
-    public lists = {
-    [this.NONE]: {
-      name: 'Все',
-      emojies: []
+  // Список всех эмодзи, загруженных с гита
+  public emojies: Emoji[] = [];
+
+  // Статусы эмодзи. Можно было сделать просто числа это производительнее, но так читабельней
+  public DELETED = 'deleted';
+  public FAVORITE = 'favorite';
+  public ALL = 'all';
+
+  // lists - списки с индексами эмодзи. Каждому списку соответствует свое имя, тэг статуса и массив с индексами, указывающими на модели,
+  // входящие в список. Связан со вьюшкой.
+  public lists = {
+    [this.ALL]: {
+      name: 'Все', // name используется во вью
+      indices: [] // содержит индексы эмодзи, входящих в этот список (в список 'Все'). Индексы указывают на this.emojies
     },
     [this.FAVORITE]: {
       name: 'Любимые',
-      emojies: []
+      indices: []
     },
     [this.DELETED]: {
       name: 'Удаленные',
-      emojies: []
+      indices: []
     }
   };
 
@@ -40,7 +44,7 @@ export class EmojiService {
   // геттер для _statuses с lazy initialization
   private get statuses () {
     return this._statuses || (() => {
-      return this._statuses = ( JSON.parse(localStorage.getItem(this.storageKey)) || {} );
+      return this._statuses = ( JSON.parse(localStorage.getItem(this.STORAGEKEY)) || {} );
     })();
   }
 
@@ -51,12 +55,12 @@ export class EmojiService {
 
   // Метод добавления статуса в хранилище (или удаления)
   public saveEmojiToStorage (emoji) {
-    if (emoji.status === this.NONE) {
+    if (emoji.status === this.ALL) {
       delete this.statuses[emoji.name];
     } else {
       this.statuses[emoji.name] = emoji.status;
     }
-    localStorage.setItem(this.storageKey, JSON.stringify(this.statuses));
+    localStorage.setItem(this.STORAGEKEY, JSON.stringify(this.statuses));
   }
 
   // Метод смены статуса эмодзи и сохранение статуса (если необходимо) в storage
@@ -75,13 +79,11 @@ export class EmojiService {
     return new Promise((resolve, reject) => {
       this.http.get('https://api.github.com/emojis').subscribe(jsondata => {
           if (jsondata) {
-            const emojies = this.parseJson(jsondata);
-
-            this.lists[this.NONE].emojies = emojies;
+            this.emojies = this.parseJson(jsondata);
 
             console.log('Load emoji data complete!');
 
-            resolve(emojies);
+            resolve();
           } else {
             console.error('No data comes from google?..');
 

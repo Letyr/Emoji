@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EmojiService } from '../emoji.service';
 
+// TODO Компонент слишком тесно связан с сервисом... вроде это не хорошо
 @Component({
   selector: 'app-emojimain',
   templateUrl: './main.component.html',
@@ -9,14 +10,16 @@ import { EmojiService } from '../emoji.service';
 })
 export class MainComponent implements OnInit {
 
-  // searchValue - искомое имя эмодзи. Связано с input-ом во вьюшке и используется в методе seek для поиска эмодзи
+  // searchValue - переменная, содержащая вводимое пользователем имя искомого эмодзи. Связано с input-ом во вьюшке
   private searchValue = '';
 
-  // currentList - результат поиска эмодзи с именами. Отображается в цикле на вьюшке
+  // currentList - отображаемый список эмодзи. Содержит индексы - указатели на модели, лежащие в emojiService.emojies.
+  // Получается в результате поиска (метод seek). В дальнейшем нарезается при помощи метода pagination результат поиска эмодзи с именами
+  // Отображается в цикле на вьюшке
   private currentList = [];
 
-  // Индекс текущего списка
-  private currentListIndex = this.emojiService.NONE;
+  // Тэг текущего списка. По умолчанию используется список 'Все'
+  private currentListTag = this.emojiService.ALL;
 
   // Флаг загрузки данных
   private loading = false;
@@ -31,9 +34,10 @@ export class MainComponent implements OnInit {
   private paginationPage = 0;
 
   // emojiService исползуется для манипуляций с данными о эмодзи
+  // роутеры для роутинга и подписки на параметры роута
   constructor(private activatedRoute: ActivatedRoute, private router: Router, private emojiService: EmojiService) {}
 
-  // Этот метод используется для сортировки пайпом keyvalue на вьюшке
+  // Этот метод используется для сортировки pipe 'keyvalue' на вьюшке. Отображение полей обьекта в цикле при помощи *ngFor
   nameOrdering(l1, l2) {
     return l1.value.name > l2.value.name;
   }
@@ -43,11 +47,13 @@ export class MainComponent implements OnInit {
     const s = this.paginationPage * this.paginationCount;
     const e = s + this.paginationCount;
     const pagination = this.currentList.slice(s, e);
+
     // Этот элемент автоматически сменит страницу, при отсутствии элементов в pagination
     if (pagination.length === 0 && this.paginationPage > 0) {
       this.paginationChangePage(this.paginationPage - 1);
       return this.pagination();
     }
+
     return pagination;
   }
 
@@ -60,21 +66,29 @@ export class MainComponent implements OnInit {
 
   // Сортировка текущего списка по имени. По идее должно происходить при каждом изменении currentList
   sort() {
-    this.currentList = this.currentList.sort((e1, e2) => e1.name > e2.name ? 1 : -1);
+    this.currentList = this.currentList.sort((i1, i2) => this.emojiService.emojies[i1].name > this.emojiService.emojies[i2].name ? 1 : -1);
   }
 
   // Метод смены списка
-  changeList(state) {
-    this.currentListIndex = state;
+  changeList(tag) {
+    this.currentListTag = tag;
+    // Нет обработки ошибки :(
 
+    // Поиск по вбитому в input значению
     this.seek();
 
+    // Сброс страницы пагинации
     this.paginationChangePage(0);
   }
 
-  // Метод смены состояния эмодзи
-  changeEmojiStatus(emoji, status) {
+  // Метод смены состояния эмодзи. Самый ужасный метод
+  // index - индекс эмодзи, который будет изменяться
+  // status - новый стату эмодзи
+  changeEmojiStatus(index, status) {
+    // Нет проверки аргументов :(
+
     let i;
+    const emoji = this.emojiService.emojies[index];
     // Предыдущий статус эмодзи
     const prevStatus = emoji.status;
 
@@ -82,29 +96,29 @@ export class MainComponent implements OnInit {
     this.emojiService.changeStatus(emoji, status);
 
     // Сложнейшая логика статусов эмодзи, отвечающая за добавление/удаление
-    // Без сарказма. Я убил на эту кучку if-ов просто непозволительно много времени, наверное потому что было 6 утра или я гупый
-    if (prevStatus === this.emojiService.NONE) {
+    // Без сарказма. Я убил на эту кучку if-ов просто чудовищно много времени, наверное потому что было 6 утра или я глупый
+    if (prevStatus === this.emojiService.ALL) {
       if (status !== this.emojiService.FAVORITE) {
-        i = this.emojiService.lists[prevStatus].emojies.indexOf(emoji);
+        i = this.emojiService.lists[prevStatus].indices.indexOf(index);
         if (i >= 0) {
-          this.emojiService.lists[prevStatus].emojies.splice(i, 1);
+          this.emojiService.lists[prevStatus].indices.splice(i, 1);
         }
       }
-      this.emojiService.lists[status].emojies.push(emoji);
+      this.emojiService.lists[status].indices.push(index);
     } else {
-      if (prevStatus !== this.emojiService.NONE) {
-        i = this.emojiService.lists[prevStatus].emojies.indexOf(emoji);
+      if (prevStatus !== this.emojiService.ALL) {
+        i = this.emojiService.lists[prevStatus].indices.indexOf(index);
         if (i >= 0) {
-          this.emojiService.lists[prevStatus].emojies.splice(i, 1);
+          this.emojiService.lists[prevStatus].indices.splice(i, 1);
         }
       }
       if (prevStatus !== this.emojiService.FAVORITE) {
-        this.emojiService.lists[status].emojies.push(emoji);
+        this.emojiService.lists[status].indices.push(index);
       }
     }
-    if (this.currentListIndex !== this.emojiService.NONE || status === this.emojiService.DELETED) {
+    if (this.currentListTag !== this.emojiService.ALL || status === this.emojiService.DELETED) {
       // Удаление из отображаемого списка. Это быстрее, чем обновить при помощи seek
-      i = this.currentList.indexOf(emoji);
+      i = this.currentList.indexOf(index);
       if (i >= 0) {
         this.currentList.splice(i, 1);
       }
@@ -112,6 +126,7 @@ export class MainComponent implements OnInit {
     }
   }
 
+  // По идее это что-то вроде переписывания url-а без перезагрузки. Здесь дописывается queryParam с searchedValue
   setSearchQueryParams () {
     this.router.navigate([], {
       queryParams: { search: this.searchValue ? this.searchValue : null }
@@ -122,32 +137,38 @@ export class MainComponent implements OnInit {
   // TODO может стоит проиндексировать данные? Но вроде и так быстро ищет...
   seek() {
     if (this.searchValue) {
-      this.currentList = this.emojiService.lists[this.currentListIndex].emojies.filter(emoji => emoji.name.startsWith(this.searchValue));
+      this.currentList = this.emojiService.lists[this.currentListTag].indices.filter(
+        i => this.emojiService.emojies[i].name.startsWith(this.searchValue)
+      );
     } else {
-      // Может при отсутсвии запроса отображать весь список? Но тогда не вывозит Material, нужна пагинация
-      // Для быстроты и удобства лучше использовать ту, что идет с Material, а она вроде как требует родные таблицы Material,
-      // а они вроде как ипользуют для отображения dataSource атрибут, то бишь только то, что в js-ке записано.
-      // Как тогда в таблицу добавить кнопки, картинки, другие компоненты?...
-      // Сложно. Лучше уж пока bootstrap в руках, чем MatTables в небе
-      // TODO Спросить у куратора про пагинацию. Делать свою с блэкджеком?
-       this.currentList = this.emojiService.lists[this.currentListIndex].emojies;
+      // TODO Спросить у куратора про пагинацию Material
+       this.currentList = this.emojiService.lists[this.currentListTag].indices;
     }
     this.sort();
   }
 
-  // Метод синхронизации статусов эмодзи поданых в качестве аргумента с записанными в storage
-  syncStatus(emojiList) {
+  // Метод индексирования списков в соответствии со статусами, хранимыми в storage
+  syncStatus() {
     const statusesObject = this.emojiService.getStatusesFromStorage();
 
+    // TODO Если в списке statusesObject всего один элемент все равно будет пробежка по всему массиву emojies, а он большой... Fix it
     if (statusesObject) {
-      this.emojiService.lists[this.emojiService.DELETED].emojies = [];
-      this.emojiService.lists[this.emojiService.FAVORITE].emojies = [];
-      // TODO Если в списке всего один элемент все равно будет пробежка по всему массиву emojiList. Fix it
-      emojiList.forEach(emoji => {
+      // Сброс индексов
+      this.emojiService.lists[this.emojiService.ALL].indices = this.emojiService.emojies.map((emoji, i) => i);
+      this.emojiService.lists[this.emojiService.DELETED].indices = [];
+      this.emojiService.lists[this.emojiService.FAVORITE].indices = [];
+
+      this.emojiService.emojies.forEach((emoji, index) => {
         if (statusesObject[emoji.name]) {
-          this.changeEmojiStatus(emoji, statusesObject[emoji.name]);
+          this.changeEmojiStatus(index, statusesObject[emoji.name]);
         }
       });
+    }
+  }
+
+  onEnter (e) {
+    if (e.key === 'Enter') {
+      this.setSearchQueryParams();
     }
   }
 
@@ -155,9 +176,9 @@ export class MainComponent implements OnInit {
   ngOnInit() {
     this.loading = true;
 
-    this.emojiService.getEmoji().then(emojies => {
+    this.emojiService.getEmoji().then(() => {
 
-      this.syncStatus(emojies);
+      this.syncStatus();
 
       console.log('Emoji statuses synchronized with storage!');
 
@@ -170,7 +191,7 @@ export class MainComponent implements OnInit {
         if (this.emojiService.lists[data.list]) {
           this.changeList(data.list);
         } else {
-          this.changeList(this.emojiService.NONE);
+          this.changeList(this.emojiService.ALL);
         }
       });
 

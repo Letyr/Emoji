@@ -14,17 +14,17 @@
 
   <div class="col-2 d-flex" [ngSwitch]="emoji.status">
 
-    <ng-container *ngSwitchCase="emojiService.NONE">
+    <ng-container *ngSwitchCase="emojiService.ALL">
       <button mat-icon-button class="emoji__button" (click)="changeEmojiStatus(emojiService.FAVORITE)"><i class="fa fa-star"></i></button>
       <button mat-icon-button class="emoji__button" (click)="changeEmojiStatus(emojiService.DELETED)"><i class="fa fa-trash"></i></button>
     </ng-container>
 
     <ng-container *ngSwitchCase="emojiService.DELETED">
-      <button mat-stroked-button class="emoji__button" (click)="changeEmojiStatus(emojiService.NONE)">Востановить</button>
+      <button mat-stroked-button class="emoji__button" (click)="changeEmojiStatus(emojiService.ALL)">Востановить</button>
     </ng-container>
 
     <ng-container *ngSwitchCase="emojiService.FAVORITE">
-      <button mat-icon-button class="emoji__button emoji__button_red" (click)="changeEmojiStatus(emojiService.NONE)"><i class="fa fa-star"></i></button>
+      <button mat-icon-button class="emoji__button emoji__button_red" (click)="changeEmojiStatus(emojiService.ALL)"><i class="fa fa-star"></i></button>
     </ng-container>
 
   </div>
